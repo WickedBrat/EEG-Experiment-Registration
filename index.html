@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+        <script src="airtable.browser.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.css" />
+    </head>
+    <body>
+            <section class="hero is-primary is-bold">
+                    <div class="hero-body">
+                      <div class="container">
+                        <h1 class="title">
+                          Registration for EEG experiment
+                        </h1>
+                        <h2 class="subtitle">
+                         Fill up the following details
+                        </h2>
+                      </div>
+                    </div>
+                  </section>
+                  <div class="container">
+                      <div class="columns is-centered">
+                          <div class="column">
+                              <div class="box">
+                                  <!-- <div class="columns"> -->
+                                    <div class="field">
+                                        <!-- <div class="field-label is-large"> -->
+                                            <label class="label is-normal">Name</label>
+                                        <!-- </div> -->
+                                            <div class="control">
+                                              <input id="name" class="input is-normal" type="text" placeholder="Enter your name">
+                                            </div>
+                                          </div>
+                                        <!-- </div> -->
+                                        <!-- <div class="columns"> -->
+                                                <div class="field">
+                                                        <!-- <div class="field-label is-large"> -->
+                                                            <label class="label is-normal">Enrollment No</label>
+                                                        <!-- </div> -->
+                                                            <div class="control">
+                                                              <input id="roll" class="input is-normal" type="text" placeholder="Enter your Enrollment No">
+                                                            </div>
+                                                </div>
+                                                <div class="field" id="datefield">
+                                                        <!-- <div class="field-label is-large"> -->
+                                                            <label class="label is-normal">Date you prefer</label>
+                                                        <!-- </div> -->
+                                                            <div class="control">
+                                                              <input id="date" class="input is-normal" type="date" placeholder="Enter the date">
+                                                            </div>
+                                                            <p id="date-alert" class="help is-danger" >Please select another date this is already booked</p>
+                                                </div>
+                                                <div class="field" id="timefield">
+                                                        <!-- <div class="field-label is-large"> -->
+                                                            <label class="label is-normal">Time</label>
+                                                        <!-- </div> -->
+                                                            <div class="control">
+                                                              <input id="time" class="input is-normal" type="text" placeholder="HH:MM AM/PM">
+                                                            </div>
+                                                </div>
+                                                <div class="field" id="coursefield">
+                                                    <label class="label is-normal">Course</label>
+                                                <div class="control">
+                                                        <div class="select">
+                                                          <select id="course">
+                                                            <option selected>Undergraduate</option>
+                                                            <option>Master</option>
+                                                            <option>Research</option>
+                                                          </select>
+                                                        </div>
+                                                </div>
+                                            </div>
+                                            <div class="field" id="yearfield">
+                                                    <label class="label is-normal">Year</label>
+                                                <div class="control">
+                                                        <div class="select">
+                                                          <select id="year">
+                                                            <option selected>I</option>
+                                                            <option>II</option>
+                                                            <option>III</option>
+                                                            <option>IV</option>
+                                                          </select>
+                                                        </div>
+                                                </div>
+                                            </div>
+                                                <div id="submitfield" class="field is-grouped is-grouped-centered">
+                                                        <p class="control">
+                                                          <a id="submit" class="button is-primary">
+                                                            Submit
+                                                          </a>
+                                                        </p>
+                                                        
+                                                      </div>
+                                                      <center><p id="successful" class="help is-success">Registration successful</p></center>
+                                        <!-- </div> -->
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+        <!-- <button id='create'>Create</button> -->
+
+        <!-- <div id="created"></div> -->
+    </body>
+
+
+    <script>
+var Airtable = require('airtable');
+// Get a base ID for an instance of art gallery example
+var base = new Airtable({ apiKey: 'keyohoRKRtvuB9AvU' }).base('appkXeLOvjvT5PrIP');
+
+// var deleteArtist = function(record) {
+//     record.destroy(function(err) {
+//         if (err) {
+//             console.log('Error destroying ', recordId, err);
+//         } else {
+//             console.log('Destroyed ', record.getId());
+//             $('div[data-record-id="'+record.getId()+'"]').remove();
+//         }
+//     });
+// };
+
+// var loadArtists = function() {
+//     $('#artists').empty();
+
+//     base('Artists').select({
+//         sort: [
+//             {field: 'Name', direction: 'asc'}
+//         ]
+//     }).eachPage(function page(records, fetchNextPage) {
+//         records.forEach(function(record) {
+//             console.log('Retrieved ', record.get('Name'));
+
+//             var $artistInfo = $('<div>');
+//             $artistInfo.append($('<h3>').text(record.get('Name')));
+//             $artistInfo.append($('<div>').text(record.get('Bio')));
+//             var x = $('<button>').text('Delete').click(function() {
+//                 deleteArtist(record);
+//             });
+//             $artistInfo.append(x)
+//             $artistInfo.attr('data-record-id', record.getId());
+
+//             $('#artists').append($artistInfo);
+//         });
+
+//         fetchNextPage();
+//     }, function done(error) {
+//         console.log(error);
+//     });
+// };
+// var dates=[];
+var isValidDate={};
+// console.log(dates);
+$('#successful').hide();
+$("#date-alert").hide();
+base('participants').select({
+    view: "Grid view"
+}).eachPage(function page(records, fetchNextPage) {
+    records.forEach(function(record) {
+        // console.log('Retrieved', record.get('Name'));
+        var date=record.get('Date');
+        // dates.push(record.get('Date'));
+        isValidDate[date]=(isValidDate[date] || 0) + 1;
+    });
+    // console.log(dates);
+    fetchNextPage();
+}, function done(err) {
+    if (err) { console.error(err); return; }
+});
+console.log(isValidDate);
+
+
+$('#submit').click(function(){
+    var name=document.getElementById("name").value;
+    var roll=document.getElementById("roll").value;
+    var date=document.getElementById("date").value;
+    var time=document.getElementById('time').value;
+    var course=$( "#course option:selected" ).text();
+    var year=$( "#year option:selected" ).text();
+    console.log(course);
+    console.log(year);
+    if(isValidDate[date] && isValidDate[date]>=2 ){
+        console.log(isValidDate[date]);
+        console.log("Please select another date this is already booked")
+        $("#date").addClass("is-danger");
+        $('#date-alert').show();
+        $('#successful').hide();
+    }else{
+    base('participants').create({
+        "Name": name,
+        "Enrollment No": roll,
+        "Date" : date,
+        "Time" : time,
+        "Course" : course,
+        "Year" : year 
+    }, function(err, record) {
+        if (err) { console.log(err); return; }
+        console.log(record.getId());
+        // $('#successful').append('Registration succesful');
+        $('#successful').show();
+        $('#date-alert').hide();
+        $('#date').removeClass('is-danger');
+    });
+    }
+});
+
+// loadArtists();
+
+</script>
+</html>
